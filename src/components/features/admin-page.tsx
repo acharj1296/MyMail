@@ -1,0 +1,28 @@
+"use client";
+
+import Link from "next/link";
+import { Activity, ArrowRight, BadgeCheck, Database, KeyRound, Layers3, Mail, ShieldAlert, Users2, Webhook } from "lucide-react";
+import { useDemoStore } from "@/stores/demo-store";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+
+export function AdminPage() {
+  const user = useDemoStore((state) => state.user);
+  const emails = useDemoStore((state) => state.emails);
+  const domains = useDemoStore((state) => state.domains);
+  const members = useDemoStore((state) => state.teamMembers);
+  const activities = useDemoStore((state) => state.activities);
+  return <>
+    <PageHeader eyebrow="Optional frontend enhancement" title="Demo administration" description="An illustrative workspace overview. No admin API, permissions, or account controls are connected." actions={<Badge tone="warning"><ShieldAlert className="h-3 w-3" />Mock admin</Badge>} />
+    <div className="mb-5 flex items-start gap-3 rounded-xl border border-rose-500/20 bg-rose-500/[.045] p-4"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-300" /><p className="text-xs leading-5 text-muted-foreground"><strong className="text-foreground">Not a secure administration surface.</strong> Account statistics are mock data. Do not use this interface to grant real access or manage secrets.</p></div>
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[{ label: "Workspace members", value: members.length, icon: Users2 }, { label: "Domains", value: domains.length, icon: Layers3 }, { label: "Sample messages", value: emails.length, icon: Mail }, { label: "Activity events", value: activities.length, icon: Activity }].map(({ label, value, icon: Icon }) => <Card key={label}><CardContent className="flex items-center gap-3 p-5"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Icon className="h-5 w-5" /></span><span><span className="block text-[10px] text-muted-foreground">{label}</span><span className="mt-1 block text-xl font-semibold tracking-[-.04em]">{value}</span></span></CardContent></Card>)}</div>
+    <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,.75fr)]">
+      <Card><CardHeader><CardTitle>Workspace health</CardTitle><p className="text-xs text-muted-foreground">Local preview status</p></CardHeader><CardContent className="space-y-2.5">{[{ title: "Demo state", detail: "Persisted to browser localStorage", icon: Database, tone: "success" }, { title: "Authentication", detail: "Simulated; no auth provider", icon: BadgeCheck, tone: "warning" }, { title: "Email delivery", detail: "Disabled; send stays in local state", icon: Mail, tone: "neutral" }, { title: "DNS integration", detail: "Disabled; records are examples", icon: Layers3, tone: "neutral" }].map(({ title, detail, icon: Icon, tone }) => <div key={title} className="flex items-center gap-3 rounded-xl border border-border/80 px-3.5 py-3"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground"><Icon className="h-4 w-4" /></span><span className="min-w-0 flex-1"><span className="block text-xs font-semibold">{title}</span><span className="mt-1 block text-[10px] text-muted-foreground">{detail}</span></span><Badge tone={tone as "success" | "warning" | "neutral"}>{tone === "success" ? "Ready" : tone === "warning" ? "Mock" : "Off"}</Badge></div>)}</CardContent></Card>
+      <Card><CardHeader><CardTitle>Integration placeholders</CardTitle><p className="text-xs text-muted-foreground">Future backend connection points</p></CardHeader><CardContent className="space-y-3">{[{ icon: KeyRound, title: "API keys", description: "Credential management is not available." }, { icon: Webhook, title: "Webhooks", description: "No external event subscriptions." }, { icon: Database, title: "Backups", description: "No backend data store to back up." }].map(({ icon: Icon, title, description }) => <div key={title} className="flex items-start gap-3 rounded-xl border border-border/80 p-3"><Icon className="mt-0.5 h-4 w-4 text-muted-foreground" /><div><p className="text-xs font-semibold">{title}</p><p className="mt-1 text-[10px] leading-4 text-muted-foreground">{description}</p></div></div>)}</CardContent></Card>
+    </div>
+    <Card className="mt-5"><CardHeader className="flex-row items-center justify-between"><div><CardTitle>Admin activity preview</CardTitle><p className="mt-1 text-xs text-muted-foreground">Recent events visible to {user.name}</p></div><Link href="/app/activity" className="text-xs font-semibold text-primary hover:underline">Open activity <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></Link></CardHeader><CardContent className="space-y-3">{activities.slice(0, 4).map((event) => <div key={event.id} className="flex items-center gap-3 rounded-xl border border-border/75 px-3 py-3"><span className="h-2 w-2 rounded-full bg-primary" /><span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold">{event.title}</span><span className="mt-1 block truncate text-[10px] text-muted-foreground">{event.description}</span></span><Badge>{event.kind}</Badge></div>)}</CardContent></Card>
+    <div className="mt-5 flex flex-wrap gap-2"><Link href="/app/team"><Button variant="secondary" size="sm"><Users2 className="h-4 w-4" />Manage demo team</Button></Link><Link href="/app/domains"><Button variant="secondary" size="sm"><Layers3 className="h-4 w-4" />View domains</Button></Link></div>
+  </>;
+}
